@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+        crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+
+    <!-- 네이버폰트 -->
+    <link href="https://hangeul.pstatic.net/hangeul_static/css/NanumDaSiSiJagHae.css" rel="stylesheet">
+    <title>치킨 파티</title>
+
+    <style type="text/css">
+        .wrap {
+            width: 70%;
+            margin: auto;
+            font-family: 'NanumDaSiSiJagHae';
+            font-size: x-large;
+            font-weight: bold;
+            padding-top: 30px; 
+        }
+
+        .top-button {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category {
+            text-align: center;
+        }
+
+        .card-btn {
+            text-align: center;
+        }
+
+        .btn-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-right span {
+            margin-right: 5px;
+        }
+
+        .input-group {
+            width: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .card-img-top {
+            max-height: 200px;
+            object-fit: cover;
+        }
+
+        .card-text {
+            margin-top: 0rem;
+            margin-bottom: 0rem;
+        }
+
+        .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+        }
+
+        .card {
+            margin-bottom: 20px;
+            height: 520px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-text.note {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-img-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 120px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            opacity: 0.7;
+        }
+
+        .status-joined {
+            background-color: rgba(82, 71, 71, 0.863);
+            
+        }
+
+        .status-full {
+            background-color: rgba(220, 53, 70, 0.377);
+            
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="top-button">
+            <a href="{{ url_for('apply') }}"><button type="button" class="btn btn-dark">파티 모집</button></a>
+            <a class="btn-center" href="{{ url_for('home') }}"><img src="/static/home.png"></a>
+            {% if user %}
+            <!-- 로그인된 경우 -->
+            <div class="navbar-right">
+                <span class="mr-2 ">{{ user.nickname }}님 환영합니다</span>
+                <a href="{{ url_for('logout') }}"><button type="button" class="btn btn-danger">로그아웃</button></a>
+            </div>
+            {% else %}
+            <!-- 로그인되지 않은 경우 -->
+            <a href="{{ url_for('login') }}"><button type="button" class="btn btn-primary">로그인</button></a>
+            {% endif %}
+        </div>
+
+        <div class="jumbotron jumbotron-fluid">
+            <div class="container">
+                <h1 class="text-center">치킨 파티</h1>
+                <p class="text-center">배달 파티원 모집</p>
+                <form action="{{ url_for('read_invite') }}" method="GET" style="display:inline;">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="title" id="searchInput"
+                            placeholder="찾고 싶은 제목을 입력하세요" maxlength="50" value="{{ request.args.get('title', '') }}">
+                        <input type="hidden" name="category" value="{{ request.args.get('category', '0') }}">
+                        <button type="submit" class="btn btn-light">검색</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="category">
+            <a href="{{ url_for('read_invite', category=0) }}"><button type="button"
+                    class="btn btn-light">전체</button></a>
+            <a href="{{ url_for('read_invite', category='치킨') }}"><button type="button"
+                    class="btn btn-light">치킨</button></a>
+            <a href="{{ url_for('read_invite', category='한식') }}"><button type="button"
+                    class="btn btn-light">한식</button></a>
+            <a href="{{ url_for('read_invite', category='분식') }}"><button type="button"
+                    class="btn btn-light">분식</button></a>
+            <a href="{{ url_for('read_invite', category='일식') }}"><button type="button"
+                    class="btn btn-light">일식</button></a>
+            <a href="{{ url_for('read_invite', category='중식') }}"><button type="button"
+                    class="btn btn-light">중식</button></a>
+            <a href="{{ url_for('read_invite', category='양식') }}"><button type="button"
+                    class="btn btn-light">양식</button></a>
+            <a href="{{ url_for('read_invite', category='카페') }}"><button type="button"
+                    class="btn btn-light">카페</button></a>
+            <a href="{{ url_for('read_invite', category='기타') }}"><button type="button"
+                    class="btn btn-light">기타</button></a>
+        </div>
+        <h5>파티 초대장</h5>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for invite in invites %}
+            <div class="col">
+                <div class="card">
+                    <div class="card-img-container position-relative">
+                        {%if invite.category == '치킨'%}
+                        <img class="card-img-top" src="/static/chicken.png" alt="Card image cap">
+                        {%elif invite.category == '한식'%}
+                        <img class="card-img-top" src="/static/korean.jpg" alt="Card image cap">
+                        {%elif invite.category == '분식'%}
+                        <img class="card-img-top" src="/static/snackfood.jpeg" alt="Card image cap">
+                        {%elif invite.category == '일식'%}
+                        <img class="card-img-top" src="/static/sushi.jpg" alt="Card image cap">
+                        {%elif invite.category == '중식'%}
+                        <img class="card-img-top" src="/static/jajang.jpg" alt="Card image cap">
+                        {%elif invite.category == '양식'%}
+                        <img class="card-img-top" src="/static/pasta.jpg" alt="Card image cap">
+                        {%elif invite.category == '카페'%}
+                        <img class="card-img-top" src="/static/coffee.jpg" alt="Card image cap">
+                        {%elif invite.category == '기타'%}
+                        <img class="card-img-top" src="/static/etc.jpg" alt="Card image cap">
+                        {%endif%}
+
+                        {% if user and invite.participants and user.username in invite.participants %}
+                        <div class="status-overlay status-joined">O</div>
+                        {% elif invite.now_person >= invite.limit_person %}
+                        <div class="status-overlay status-full">X</div>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">{{ invite.title }}</h3>
+                        <p class="card-text">#{{ invite.category }}</p>
+                        <p class="card-text">인원 : {{ invite.now_person }}/{{ invite.limit_person }}</p>
+                        <p class="card-text">유형 : {{ invite.type }}</p>
+                        {% if invite.note %}
+                        <p class="card-text">{{ invite.note }}</p>
+                        {% endif %}
+                        <p class="card-text">{{ invite.created_at }}</p>
+
+                        <div class="card-btn">
+                            {%if invite.now_person != invite.limit_person%}
+                            <form action="{{ url_for('delete') }}" method="post" style="display:inline;">
+                                <input type="hidden" name="id_give" value="{{ invite._id }}">
+                                <button type="submit" class="btn btn-primary">삭제</button>
+                            </form>
+                            <form style="display:inline;">
+                                <a href="{{ url_for('update' , id=invite._id) }}"><button type="button"
+                                        class="btn btn-primary">수정</button></a>
+                            </form>
+                            {%endif%}
+
+                            {% if user and invite.participants and (user.username in invite.participants) %}
+                            <!-- 이미 참여한 경우: 버튼을 "완료"로 표시하고 비활성화 -->
+                            <button type="button" class="btn btn-primary" disabled>완료</button>
+                            {% elif invite.now_person != invite.limit_person %}
+                            <form action="{{ url_for('complete') }}" method="POST" style="display:inline;"
+                                onsubmit="return confirm('참여하시겠습니까?');">
+                                <input type="hidden" name="id_give" value="{{ invite._id }}">
+                                <button type="submit" class="btn btn-primary participate-btn">참여</button>
+                            </form>
+                            {% else %}
+                            <form action="{{ url_for('complete') }}" method="POST" style="display:inline;">
+                                <input type="hidden" name="id_give" value="{{ invite._id }}">
+                                <button type="button" class="btn btn-danger" onclick="alert('마감되었습니다.')">인원
+                                    마감</button>
+                            </form>
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="d-flex justify-content-between my-4">
+            {% if has_previous %}
+            <a href="{{ url_for('home', page=page-1, category=request.args.get('category', '0')) }}"
+                class="btn btn-secondary">
+                이전 페이지
+            </a>
+            {% else %}
+            <span></span>
+            {% endif %}
+
+            {% if has_more %}
+            <a href="{{ url_for('home', page=page+1, category=request.args.get('category', '0')) }}"
+                class="btn btn-secondary">
+                다음 페이지
+            </a>
+            {% else %}
+            <span></span>
+            {% endif %}
+        </div>
+
+
+        <script>
+            window.onpageshow = function (event) {
+                if (event.persisted || window.performance && window.performance.navigation.type === 2) {
+                    location.reload();  // 뒤로 가기 시 자동 새로고침
+                }
+            };
+        </script>
+
+        {% if request.args.get('error') %}
+        <script>
+            alert("{{ request.args.get('error') }}");
+            // URL에서 error 파라미터 제거 (페이지 리로드 없이)
+            const url = new URL(window.location.href);
+            url.searchParams.delete('error');
+            window.history.replaceState(null, '', url.toString());
+        </script>
+        {% endif %}
+
+    {% if request.args.get('message') %}
+    <script>
+        alert("{{ request.args.get('message') }}");
+        // URL에서 message 파라미터 제거 (페이지 리로드 없이)
+        const url = new URL(window.location.href);
+        url.searchParams.delete('message');
+        window.history.replaceState(null, '', url.toString());
+    </script>
+    {% endif %}
+
+
+
+
+
+
+
+</body>
+
+</html>
